@@ -1,0 +1,10 @@
+*bin*
+*debug*
+vendor
+*.tmp
+*.txt
+coverage
+*.log
+*.bin
+.vscode
+release
