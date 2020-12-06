@@ -68,23 +68,23 @@ func main() {
 }
 
 func appHandler(ctx *cli.AppContext) error {
-	source := ctx.Flags.String("source")
+	source := ctx.Flags.String("source").Value()
 	if source == "" {
 		return fmt.Errorf("source has an empty value")
 	}
-	destination := ctx.Flags.String("destination")
+	destination := ctx.Flags.String("destination").Value()
 	if destination == "" {
 		return fmt.Errorf("destination has an empty value")
 	}
-	format := ctx.Flags.String("format")
+	format := ctx.Flags.String("format").Value()
 	if format == "" {
 		return fmt.Errorf("format has an empty value")
 	}
-	checksum, err := ctx.Flags.Bool("checksum")
+	checksum, err := ctx.Flags.Bool("checksum").Value()
 	if err != nil {
 		return err
 	}
-	checksumAlgo := ctx.Flags.String("checksum-algo")
+	checksumAlgo := ctx.Flags.String("checksum-algo").Value()
 	if checksumAlgo == "" {
 		return fmt.Errorf("checksum-algo has an empty value")
 	}
