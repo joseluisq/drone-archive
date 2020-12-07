@@ -7,8 +7,10 @@ LABEL version="${DRONE_ARCHIVE_VERSION}" \
     description="Drone plugin that provides Tar/GZ and Zip archiving with optional checksum computation." \
     maintainer="Jose Quintana <joseluisq.net>"
 
-ADD release/linux/amd64/drone-archive /usr/local/bin/
+COPY ./docker/alpine/entrypoint.sh /
+COPY release/linux/amd64/drone-archive /usr/local/bin/
 
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["drone-archive"]
 
 # Metadata
