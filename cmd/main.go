@@ -22,27 +22,27 @@ func main() {
 	app.BuildTime = buildTime
 	app.Flags = []cli.Flag{
 		cli.FlagString{
-			Name:    "source",
+			Name:    "src",
 			Summary: "File or directory to archive and compress.",
 			Aliases: []string{"s"},
 			EnvVar:  "PLUGIN_SOURCE",
 		},
 		cli.FlagString{
-			Name:    "destination",
-			Summary: "File path to save the archived and compressed file.",
+			Name:    "dest",
+			Summary: "File destination path to save the archived/compressed file.",
 			Aliases: []string{"d"},
 			EnvVar:  "PLUGIN_DESTINATION",
 		},
 		cli.FlagString{
 			Name:    "format",
-			Summary: "Define a `tar` and `zip` archiving format with compression. tar format uses Gzip compression.",
+			Summary: "Define a `tar` and `zip` archiving format with compression. Tar format uses Gzip compression.",
 			Value:   "tar",
 			Aliases: []string{"f"},
 			EnvVar:  "PLUGIN_FORMAT",
 		},
 		cli.FlagBool{
 			Name:    "checksum",
-			Summary: "Enable checksum file computation. File'll be saved on same base path like destination.",
+			Summary: "Enable checksum file computation.",
 			Value:   false,
 			Aliases: []string{"c"},
 			EnvVar:  "PLUGIN_CHECKSUM",
@@ -50,13 +50,13 @@ func main() {
 		cli.FlagString{
 			Name:    "checksum-algo",
 			Summary: "Define the checksum `md5`, `sha1`, `sha256` or `sha512` algorithm.",
-			Value:   "sha256sum",
+			Value:   "sha256",
 			Aliases: []string{"a"},
 			EnvVar:  "PLUGIN_CHECKSUM_ALGO",
 		},
 		cli.FlagString{
-			Name:    "checksum-destination",
-			Summary: "Define the checksum file destination path.",
+			Name:    "checksum-dest",
+			Summary: "File destination path of the checksum.",
 			Aliases: []string{"e"},
 			EnvVar:  "PLUGIN_CHECKSUM_DESTINATION",
 		},
@@ -68,25 +68,29 @@ func main() {
 }
 
 func appHandler(ctx *cli.AppContext) error {
-	source := ctx.Flags.String("source").Value()
+	source := ctx.Flags.String("src").Value()
 	if source == "" {
-		return fmt.Errorf("source has an empty value")
+		return fmt.Errorf("source file or directory path was not provided")
 	}
-	destination := ctx.Flags.String("destination").Value()
+	destination := ctx.Flags.String("dest").Value()
 	if destination == "" {
-		return fmt.Errorf("destination has an empty value")
+		return fmt.Errorf("archive file destination path was not provided")
 	}
 	format := ctx.Flags.String("format").Value()
 	if format == "" {
-		return fmt.Errorf("format has an empty value")
+		return fmt.Errorf("archive format was not provided or unsupported")
 	}
 	checksum, err := ctx.Flags.Bool("checksum").Value()
 	if err != nil {
 		return err
 	}
 	checksumAlgo := ctx.Flags.String("checksum-algo").Value()
-	if checksumAlgo == "" {
-		return fmt.Errorf("checksum-algo has an empty value")
+	if checksum && checksumAlgo == "" {
+		return fmt.Errorf("checksum algorithm was not provided")
+	}
+	checksumDest := ctx.Flags.String("checksum-dest").Value()
+	if checksum && checksumDest == "" {
+		return fmt.Errorf("checksum file destination path was not provided")
 	}
 	plugin := archive.Plugin{
 		Source:       source,
@@ -94,6 +98,7 @@ func appHandler(ctx *cli.AppContext) error {
 		Format:       format,
 		Checksum:     checksum,
 		ChecksumAlgo: checksumAlgo,
+		ChecksumDest: checksumDest,
 	}
 	return plugin.Exec()
 }

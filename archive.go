@@ -18,40 +18,47 @@ type Plugin struct {
 }
 
 // Exec executes the plugin step
-func (p Plugin) Exec() error {
+func (p Plugin) Exec() (err error) {
+	var checksumFile string
 	switch p.Format {
 	case "tar":
 		if p.Checksum {
-			checksum, err := compactor.CreateTarballWithChecksum(
+			checksumFile, err = compactor.CreateTarballWithChecksum(
 				p.Source,
 				p.Destination,
 				p.ChecksumAlgo,
 				p.ChecksumDest,
 			)
-			if err != nil {
-				return err
-			}
-			log.Printf("checksum file saved at %s.\n", checksum)
 		} else {
-			return compactor.CreateTarball(p.Source, p.Destination)
+			err = compactor.CreateTarball(p.Source, p.Destination)
+		}
+		if err != nil {
+			return err
+		}
+		log.Printf("tar/gz file saved on %s\n", p.Destination)
+		if p.Checksum {
+			log.Printf("checksum file saved on %s\n", checksumFile)
 		}
 	case "zip":
 		if p.Checksum {
-			checksum, err := compactor.CreateZipballWithChecksum(
+			checksumFile, err = compactor.CreateZipballWithChecksum(
 				p.Source,
 				p.Destination,
 				p.ChecksumAlgo,
 				p.ChecksumDest,
 			)
-			if err != nil {
-				return err
-			}
-			log.Printf("checksum file saved at %s.\n", checksum)
 		} else {
-			return compactor.CreateZipball(p.Source, p.Destination)
+			err = compactor.CreateZipball(p.Source, p.Destination)
+		}
+		if err != nil {
+			return err
+		}
+		log.Printf("zip file saved on %s\n", p.Destination)
+		if p.Checksum {
+			log.Printf("checksum file saved on %s\n", checksumFile)
 		}
 	default:
-		return fmt.Errorf("format `%s` is not supported", p.Format)
+		return fmt.Errorf("archive format `%s` is not supported", p.Format)
 	}
-	return nil
+	return err
 }
