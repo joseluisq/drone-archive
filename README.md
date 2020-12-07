@@ -4,18 +4,73 @@
 
 WIP project under **active** development.
 
-## Test
+## Usage
+
+```yml
+---
+kind: pipeline
+type: docker
+name: production
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: archive
+  image: joseluisq/drone-archive
+  settings:
+    format: tar
+    src: ./release/myprogram
+    dest: ./myprogram.tar.gz
+    checksum: true
+    checksum_algo: sha256
+    checksum_dest: myprogram.CHECKSUM.tar.gz.txt
+```
+
+## API
+
+```sh
+$ drone-archive --help
+# NAME: archive plugin [OPTIONS] COMMAND
+#
+# Archive a file or directory using Tar/GZ or Zip with optional checksum computation.
+#
+# OPTIONS:
+#   -s --src              File or directory to archive and compress. [env: PLUGIN_SOURCE]
+#   -d --dest             File destination path to save the archived/compressed file. [env: PLUGIN_DESTINATION]
+#   -f --format           Define a `tar` and `zip` archiving format with compression. Tar format uses Gzip compression. [default: tar] [env: PLUGIN_FORMAT]
+#   -c --checksum         Enable checksum file computation. [default: false] [env: PLUGIN_CHECKSUM]
+#   -a --checksum-algo    Define the checksum `md5`, `sha1`, `sha256` or `sha512` algorithm. [default: sha256] [env: PLUGIN_CHECKSUM_ALGO]
+#   -e --checksum-dest    File destination path of the checksum. [env: PLUGIN_CHECKSUM_DESTINATION]
+#   -h --help             Prints help information
+#   -v --version          Prints version information
+```
+
+## Development
+
+### Test
 
 ```sh
 make test
 ```
 
-## Build
+### Build
 
-Build the binaries with the following commands:
+Build the binaries and Docker image.
 
 ```sh
-make build
+make build image-build
+```
+
+### Run
+
+Run Docker images examples.
+
+```sh
+make image-tar
+# or
+make image-zip
 ```
 
 ## Contributions
