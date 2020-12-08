@@ -90,8 +90,6 @@ trigger:
     - refs/tags/**beta**
     - refs/tags/**latest**
     - refs/tags/**dev**
-  target:
-  - production
 
 
 
