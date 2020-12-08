@@ -60,7 +60,7 @@ make test
 Build the binaries and Docker image.
 
 ```sh
-make build image-build
+make build image.build
 ```
 
 ### Run
@@ -68,9 +68,9 @@ make build image-build
 Run Docker images examples.
 
 ```sh
-make image-tar
+make image.tar
 # or
-make image-zip
+make image.zip
 ```
 
 ## Contributions

@@ -1,0 +1,122 @@
+---
+kind: pipeline
+type: docker
+name: development
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: test
+  image: golang:1.15.6-buster
+  commands:
+    - make install
+    - make test
+
+trigger:
+  event:
+    - push
+    - pull_request
+  branch:
+    - master
+    - develop
+    - feature/*
+    - bugfix/*
+    - hotfix/*
+
+
+
+---
+kind: pipeline
+type: docker
+name: production
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: test
+  image: golang:1.15.6-buster
+  commands:
+    - make install
+    - make test
+
+- name: build
+  image: golang:1.15.6-buster
+  environment:
+    GOOS: linux
+    BINARY_VERSION: ${DRONE_TAG##v}
+  commands:
+  - make prod.release
+
+- name: executable
+  image: golang:1.15.6-buster
+  commands:
+  - make prod.executable
+
+- name: dockerhub-publish
+  image: joseluisq/drone-docker
+  privileged: true
+  settings:
+    repo: joseluisq/drone-archive
+    dockerfile: ./docker/alpine/Dockerfile
+    username:
+      from_secret: dockerhub_username
+    password:
+      from_secret: dockerhub_password
+    build_args:
+      - DRONE_ARCHIVE_VERSION=${DRONE_TAG##v}
+    auto_tag: true
+    auto_tag_aliases:
+      - latest
+
+- name: github-release
+  image: plugins/github-release
+  settings:
+    api_key:
+      from_secret: github_token
+    title: ${DRONE_TAG}
+    draft: true
+
+trigger:
+  ref:
+    include:
+    - refs/tags/v*
+    exclude:
+    - refs/tags/**rc**
+    - refs/tags/**alpha**
+    - refs/tags/**beta**
+    - refs/tags/**latest**
+    - refs/tags/**dev**
+  target:
+  - production
+
+
+
+---
+kind: pipeline
+type: docker
+name: notification
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: notify
+  image: plugins/slack
+  settings:
+    webhook:
+      from_secret: slack_webhook
+    channel: ci-cd
+
+depends_on:
+- development
+- production
+
+trigger:
+  status:
+  - success
+  - failure

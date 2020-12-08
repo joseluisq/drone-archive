@@ -1,9 +1,17 @@
-DOCKER_IMAGE_TAG=joseluisq/drone-archive
+# Configuration
+
+BINARY_VERSION ?= 0.0.0
+BINARY_OUTPUT_PATH ?= release/linux/amd64/drone-archive
+BINARY_BUILD_DATETIME ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+DOCKER_IMAGE_NAME ?= joseluisq/drone-archive
+DOCKER_FILE ?= docker/alpine/Dockerfile
+
 DRONE_COMMIT_SHA ?= $(shell git rev-parse HEAD)
-LABEL_SCHEMA_BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 LABEL_SCHEMA_VCS_REF ?= $(shell git rev-parse --short HEAD)
-GOOS=linux
-BINARY_VERSION=0.1.0
+
+
+# Development
 
 install:
 	@go version
@@ -18,49 +26,71 @@ test:
 		-v -timeout 30s -race -coverprofile=coverage.txt -covermode=atomic
 .PHONY: test
 
-build:
-	@env \
-		CGO_ENABLED=0 \
-		GO111MODULE=on \
-		GOOS=$(GOOS) \
-			go build -v \
-				-ldflags "-s -w -X main.version=$(BINARY_VERSION)" \
-				-a -o release/linux/amd64/drone-archive ./cmd
-	@du -sh release/linux/amd64/.
-.PHONY: build
-
 coverage:
 	@bash -c "bash <(curl -s https://codecov.io/bash)"
 .PHONY: coverage
 
-image-build:
+build:
+	@env \
+		CGO_ENABLED=0 \
+		GO111MODULE=on \
+			go build -v \
+				-ldflags "-s -w -X main.version=$(BINARY_VERSION)" \
+				-a -o $(BINARY_OUTPUT_PATH) ./cmd
+	@du -sh $(BINARY_OUTPUT_PATH)
+.PHONY: build
+
+docker.build:
 	@docker build \
 		--build-arg DRONE_ARCHIVE_VERSION=$(BINARY_VERSION) \
-		--label org.label-schema.build-date=$(LABEL_SCHEMA_BUILD_DATE) \
+		--label org.label-schema.build-date=$(BINARY_BUILD_DATETIME) \
 		--label org.label-schema.vcs-ref=$(LABEL_SCHEMA_VCS_REF) \
-		--file docker/alpine/Dockerfile \
-		--tag $(DOCKER_IMAGE_TAG):local .
-.PHONY: image-build
+		--file $(DOCKER_FILE) \
+		--tag $(DOCKER_IMAGE_NAME):local .
+.PHONY: docker.build
 
-image-tar:
+docker.tar:
 	@docker run --rm \
 		-e PLUGIN_CHECKSUM=true \
-		-e PLUGIN_CHECKSUM_DESTINATION=release/linux/amd64/file.CHECKSUM.tar.gz.txt \
+		-e PLUGIN_CHECKSUM_DESTINATION=$(BINARY_OUTPUT_PATH).CHECKSUM.tar.gz.txt \
 		-v $(PWD):$(PWD) \
 		-w $(PWD) \
-			$(DOCKER_IMAGE_TAG):local \
-				--src release/linux/amd64/drone-archive \
-				--dest release/linux/amd64/drone-archive.tar.gz
-.PHONY: image-tar
+			$(DOCKER_IMAGE_NAME):local \
+				--src $(BINARY_OUTPUT_PATH) \
+				--dest $(BINARY_OUTPUT_PATH).tar.gz
+.PHONY: docker.tar
 
-image-zip:
+docker.zip:
 	@docker run --rm \
 		-e PLUGIN_CHECKSUM=true \
-		-e PLUGIN_CHECKSUM_DESTINATION=release/linux/amd64/file.CHECKSUM.zip.txt \
+		-e PLUGIN_CHECKSUM_DESTINATION=$(BINARY_OUTPUT_PATH).CHECKSUM.zip.txt \
 		-e PLUGIN_FORMAT=zip \
 		-v $(PWD):$(PWD) \
 		-w $(PWD) \
-			$(DOCKER_IMAGE_TAG):local \
-				--src release/linux/amd64/drone-archive \
-				--dest release/linux/amd64/drone-archive.zip
-.PHONY: image-zip
+			$(DOCKER_IMAGE_NAME):local \
+				--src $(BINARY_OUTPUT_PATH) \
+				--dest $(BINARY_OUTPUT_PATH).zip
+.PHONY: docker.zip
+
+
+# Production
+
+prod.release:
+	@go version
+	@env \
+		CGO_ENABLED=0 \
+		GO111MODULE=on \
+			go build -v \
+				-ldflags "\
+					-s -w \
+					-X 'main.versionNumber=$(BINARY_VERSION)' \
+					-X 'main.buildTime=$(BINARY_BUILD_DATETIME)'\
+				" \
+				-a -o $(BINARY_OUTPUT_PATH) ./cmd
+	@du -sh $(BINARY_OUTPUT_PATH)
+.PHONY: prod.release
+
+prod.executable:
+	@$(BINARY_OUTPUT_PATH) --help
+	@$(BINARY_OUTPUT_PATH) --version
+.PHONY: prod.executable
