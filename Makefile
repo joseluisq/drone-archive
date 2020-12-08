@@ -52,7 +52,7 @@ docker.build:
 docker.tar:
 	@docker run --rm \
 		-e PLUGIN_CHECKSUM=true \
-		-e PLUGIN_CHECKSUM_DESTINATION=$(BINARY_OUTPUT_PATH).CHECKSUM.tar.gz.txt \
+		-e PLUGIN_CHECKSUM_DEST=$(BINARY_OUTPUT_PATH).CHECKSUM.tar.gz.txt \
 		-v $(PWD):$(PWD) \
 		-w $(PWD) \
 			$(DOCKER_IMAGE_NAME):local \
@@ -63,7 +63,7 @@ docker.tar:
 docker.zip:
 	@docker run --rm \
 		-e PLUGIN_CHECKSUM=true \
-		-e PLUGIN_CHECKSUM_DESTINATION=$(BINARY_OUTPUT_PATH).CHECKSUM.zip.txt \
+		-e PLUGIN_CHECKSUM_DEST=$(BINARY_OUTPUT_PATH).CHECKSUM.zip.txt \
 		-e PLUGIN_FORMAT=zip \
 		-v $(PWD):$(PWD) \
 		-w $(PWD) \

@@ -5,6 +5,10 @@ vendor
 *.txt
 coverage
 *.log
+*.zip
+*.tar
+*.gz
 *.bin
 .vscode
 release
+**/.DS_Store

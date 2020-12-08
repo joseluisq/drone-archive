@@ -25,13 +25,13 @@ func main() {
 			Name:    "src",
 			Summary: "File or directory to archive and compress.",
 			Aliases: []string{"s"},
-			EnvVar:  "PLUGIN_SOURCE",
+			EnvVar:  "PLUGIN_SRC",
 		},
 		cli.FlagString{
 			Name:    "dest",
 			Summary: "File destination path to save the archived/compressed file.",
 			Aliases: []string{"d"},
-			EnvVar:  "PLUGIN_DESTINATION",
+			EnvVar:  "PLUGIN_DEST",
 		},
 		cli.FlagString{
 			Name:    "format",
@@ -58,7 +58,7 @@ func main() {
 			Name:    "checksum-dest",
 			Summary: "File destination path of the checksum.",
 			Aliases: []string{"e"},
-			EnvVar:  "PLUGIN_CHECKSUM_DESTINATION",
+			EnvVar:  "PLUGIN_CHECKSUM_DEST",
 		},
 	}
 	app.Handler = appHandler
