@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/joseluisq/drone-archive.svg?branch=master)](https://travis-ci.com/joseluisq/drone-archive) [![codecov](https://codecov.io/gh/joseluisq/drone-archive/branch/master/graph/badge.svg)](https://codecov.io/gh/joseluisq/drone-archive) [![Go Report Card](https://goreportcard.com/badge/github.com/joseluisq/drone-archive)](https://goreportcard.com/report/github.com/joseluisq/drone-archive) [![PkgGoDev](https://pkg.go.dev/badge/github.com/joseluisq/drone-archive)](https://pkg.go.dev/github.com/joseluisq/drone-archive) [![Docker Image Version (tag latest semver)](https://img.shields.io/docker/v/joseluisq/drone-archive/1)](https://hub.docker.com/r/joseluisq/drone-archive/) [![Docker Image Size (tag)](https://img.shields.io/docker/image-size/joseluisq/drone-archive/1)](https://hub.docker.com/r/joseluisq/drone-archive/) [![Docker Image](https://img.shields.io/docker/pulls/joseluisq/drone-archive.svg)](https://hub.docker.com/r/joseluisq/drone-archive/)
 
-> [Drone](https://drone.io/) plugin that provides Tar/GZ and Zip archiving with optional checksum computation.
+> [Drone](https://drone.io/) plugin that provides Tar/Gzip and Zip archiving with optional checksum computation.
 
 ## Usage
 
@@ -21,6 +21,7 @@ steps:
   image: joseluisq/drone-archive
   settings:
     format: tar
+    src_base_path: ./my-base-path
     src: ./release/myprogram
     dest: ./myprogram.tar.gz
     checksum: true
@@ -34,9 +35,10 @@ steps:
 $ drone-archive --help
 # NAME: archive plugin [OPTIONS] COMMAND
 #
-# Archive a file or directory using Tar/GZ or Zip with optional checksum computation.
+# Archive a file or directory using Tar/Gzip or Zip with optional checksum computation.
 #
 # OPTIONS:
+#   -b --src-base-path    Source base path directory which will be skipped for each archive file header. [env: PLUGIN_SRC_BASE_PATH]
 #   -s --src              File or directory to archive and compress. [env: PLUGIN_SRC]
 #   -d --dest             File destination path to save the archived/compressed file. [env: PLUGIN_DEST]
 #   -f --format           Define a `tar` and `zip` archiving format with compression. Tar format uses Gzip compression. [default: tar] [env: PLUGIN_FORMAT]
