@@ -56,7 +56,8 @@ docker.tar:
 		-v $(PWD):$(PWD) \
 		-w $(PWD) \
 			$(DOCKER_IMAGE_NAME):local \
-				--src $(BINARY_OUTPUT_PATH) \
+				--src-base-path release/linux \
+				--src amd64 \
 				--dest $(BINARY_OUTPUT_PATH).tar.gz
 .PHONY: docker.tar
 

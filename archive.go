@@ -9,6 +9,7 @@ import (
 
 // Plugin defines the Archive plugin parameters.
 type Plugin struct {
+	BasePath     string
 	Source       string
 	Destination  string
 	Format       string
@@ -24,31 +25,33 @@ func (p Plugin) Exec() (err error) {
 	case "tar":
 		if p.Checksum {
 			checksumFile, err = compactor.CreateTarballWithChecksum(
+				p.BasePath,
 				p.Source,
 				p.Destination,
 				p.ChecksumAlgo,
 				p.ChecksumDest,
 			)
 		} else {
-			err = compactor.CreateTarball(p.Source, p.Destination)
+			err = compactor.CreateTarball(p.BasePath, p.Source, p.Destination)
 		}
 		if err != nil {
 			return err
 		}
-		log.Printf("tar/gz file saved on %s\n", p.Destination)
+		log.Printf("tar/gzip file saved on %s\n", p.Destination)
 		if p.Checksum {
 			log.Printf("checksum file saved on %s\n", checksumFile)
 		}
 	case "zip":
 		if p.Checksum {
 			checksumFile, err = compactor.CreateZipballWithChecksum(
+				p.BasePath,
 				p.Source,
 				p.Destination,
 				p.ChecksumAlgo,
 				p.ChecksumDest,
 			)
 		} else {
-			err = compactor.CreateZipball(p.Source, p.Destination)
+			err = compactor.CreateZipball(p.BasePath, p.Source, p.Destination)
 		}
 		if err != nil {
 			return err

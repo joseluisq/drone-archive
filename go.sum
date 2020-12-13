@@ -1,4 +1,4 @@
 github.com/joseluisq/cline v0.1.0-beta.9 h1:K0SlZ1V44m11x+aXweITWjSAXaTCNkxrn/zPDlifgIw=
 github.com/joseluisq/cline v0.1.0-beta.9/go.mod h1:OHx3HRPOMpaxrkgR6pNdPCdcOh55WhP2nT7OiSFLLkA=
-github.com/joseluisq/compactor v0.1.0 h1:Tg+KoYFkiAgqTb0a/HaYHaK7ddtz3nx6gdzzX0dRFok=
-github.com/joseluisq/compactor v0.1.0/go.mod h1:631VN26eDdcuwXMLBGUqyEpDkl5nKBld2gaHAJsG29M=
+github.com/joseluisq/compactor v0.2.0 h1:UAfMfyU1UCxvJDAc8aUWYcfJZTNML3p1N+Kd7zJ+Og0=
+github.com/joseluisq/compactor v0.2.0/go.mod h1:631VN26eDdcuwXMLBGUqyEpDkl5nKBld2gaHAJsG29M=

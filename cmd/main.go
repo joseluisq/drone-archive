@@ -17,10 +17,16 @@ var (
 func main() {
 	app := cli.New()
 	app.Name = "archive plugin"
-	app.Summary = "Archive a file or directory using Tar/GZ or Zip with optional checksum computation."
+	app.Summary = "Archive a file or directory using Tar/Gzip or Zip with optional checksum computation."
 	app.Version = versionNumber
 	app.BuildTime = buildTime
 	app.Flags = []cli.Flag{
+		cli.FlagString{
+			Name:    "src-base-path",
+			Summary: "Source base path directory which will be skipped for each archive file header.",
+			Aliases: []string{"b"},
+			EnvVar:  "PLUGIN_SRC_BASE_PATH",
+		},
 		cli.FlagString{
 			Name:    "src",
 			Summary: "File or directory to archive and compress.",
@@ -68,6 +74,7 @@ func main() {
 }
 
 func appHandler(ctx *cli.AppContext) error {
+	sourceBasePath := ctx.Flags.String("src-base-path").Value()
 	source := ctx.Flags.String("src").Value()
 	if source == "" {
 		return fmt.Errorf("source file or directory path was not provided")
@@ -93,6 +100,7 @@ func appHandler(ctx *cli.AppContext) error {
 		return fmt.Errorf("checksum file destination path was not provided")
 	}
 	plugin := archive.Plugin{
+		BasePath:     sourceBasePath,
 		Source:       source,
 		Destination:  destination,
 		Format:       format,
